@@ -1,10 +1,10 @@
 /**
- * Registro central de imágenes.
+ * Registro central de las imágenes FIJAS del sitio (hero, servicios, llamada a la
+ * acción y taller). Son trabajos reales de MC Diseños, guardados en
+ * /public/images/sitio y /public/images/taller.
  *
- * Las fotografías de /public/images son trabajos reales de MC Diseños
- * (tomadas de su página oficial de Facebook). Para cambiar una foto basta con
- * reemplazar el archivo o actualizar aquí `src` y `alt`; ningún componente
- * necesita modificarse.
+ * Las fotos de la GALERÍA no están aquí: se administran desde el panel /keystatic
+ * y viven en /public/images/proyectos (ver src/data/projects.ts).
  *
  * Las texturas de la sección de materiales siguen siendo referencias visuales
  * de Unsplash (licencia Unsplash) hasta contar con el catálogo real de láminas.
@@ -31,11 +31,11 @@ const unsplash = (id: string, alt: string): SiteImage => ({
 
 export const images = {
   hero: real(
-    "hero/cocina-isla-blanca.jpg",
+    "sitio/hero-cocina-isla-blanca.jpg",
     "Cocina integral blanca con isla de mesón negro y techo con panel en madera, fabricada por MC Diseños",
   ),
   cta: real(
-    "empotrados/barra-cafeteria.jpg",
+    "sitio/cta-barra-cafeteria.jpg",
     "Barra de cafetería con frentes en madera clara, mesón en piedra y vigas decorativas en el techo",
   ),
   materialsFeature: real(
@@ -45,126 +45,28 @@ export const images = {
 
   services: {
     cocinas: real(
-      "hero/cocina-isla-blanca.jpg",
+      "sitio/hero-cocina-isla-blanca.jpg",
       "Cocina integral blanca con isla, campana central y detalle en madera",
     ),
     empotrados: real(
-      "empotrados/mueble-tv-marmol-madera.jpg",
+      "sitio/servicio-empotrados.jpg",
       "Mueble empotrado en madera con nicho de mármol, repisas y cajones suspendidos",
     ),
     closets: real(
-      "closets/vestier-pasillo-madera.jpg",
+      "sitio/servicio-closets.jpg",
       "Vestier en madera a ambos lados de un pasillo, con puertas, repisas y cajones",
     ),
     puertas: real(
-      "puertas/puerta-madera-closet-gris.jpg",
+      "sitio/servicio-puertas.jpg",
       "Puerta en lámina tono madera junto a un clóset de frentes grises",
     ),
     mesas: real(
-      "mesas/mesas-terraza-restaurante.jpg",
+      "sitio/servicio-mesas.jpg",
       "Mesas con cubierta en madera clara en la terraza de un restaurante",
     ),
     cnc: real(
-      "cnc/muro-ondulado-madera.jpg",
+      "sitio/servicio-cnc.jpg",
       "Muro decorativo de listones de madera con forma ondulada sobre un mueble bajo",
-    ),
-  },
-
-  projects: {
-    cocinaIslaTecho: real(
-      "cocinas/cocina-isla-blanca-techo-madera.jpg",
-      "Cocina blanca con isla de mesón negro, campana de isla y techo con panel en madera",
-    ),
-    cocinaIslaMadera: real(
-      "cocinas/cocina-isla-frentes-madera.jpg",
-      "Cocina blanca con isla de frentes en madera y horno empotrado",
-    ),
-    cocinaGrafito: real(
-      "cocinas/cocina-grafito-isla-blanca.jpg",
-      "Cocina con muebles bajos en grafito, superiores blancos e isla con mesón negro",
-    ),
-    cocinaLineal: real(
-      "cocinas/cocina-lineal-blanca.jpg",
-      "Cocina lineal con frentes blancos brillantes y mesón negro",
-    ),
-    empotradoTv: real(
-      "empotrados/mueble-tv-marmol-madera.jpg",
-      "Mueble empotrado en madera con nicho de mármol, repisas y cajones suspendidos",
-    ),
-    empotradoBar: real(
-      "empotrados/repisas-y-mueble-bar.jpg",
-      "Repisas flotantes en madera y mueble bajo gris con vinera en cruz",
-    ),
-    empotradoCafeteria: real(
-      "empotrados/barra-cafeteria.jpg",
-      "Barra de cafetería con frentes en madera clara y mesón en piedra oscura",
-    ),
-    empotradoOficina: real(
-      "empotrados/oficina-mobiliario.jpg",
-      "Oficina con escritorio, biblioteca, panel para TV y techo de listones en madera",
-    ),
-    empotradoLavamanos: real(
-      "empotrados/mueble-lavamanos-suspendido.jpg",
-      "Mueble de lavamanos suspendido en tono madera oscura con perfiles de aluminio",
-    ),
-    empotradoBano: real(
-      "empotrados/mueble-bano-espejo-redondo.jpg",
-      "Mueble de baño en tono madera con lavamanos blanco y espejo redondo",
-    ),
-    closetCajonera: real(
-      "closets/closet-madera-cajonera.jpg",
-      "Clóset de piso a techo en tono madera con cajonera central",
-    ),
-    closetPasillo: real(
-      "closets/vestier-pasillo-madera.jpg",
-      "Vestier en madera a ambos lados de un pasillo con repisas y cajones",
-    ),
-    closetAbierto: real(
-      "closets/vestier-abierto-madera.jpg",
-      "Vestier abierto en madera con módulos, barras para colgar y cajones",
-    ),
-    closetBlanco: real(
-      "closets/closet-abierto-blanco.jpg",
-      "Clóset abierto en tono claro con repisas, cajones y zapatero metálico",
-    ),
-    closetGrafito: real(
-      "closets/closet-grafito-repisas.jpg",
-      "Clóset en tono grafito con puertas, repisas abiertas y cajones",
-    ),
-    puertaClosetGris: real(
-      "puertas/puerta-madera-closet-gris.jpg",
-      "Puerta en lámina tono madera junto a un clóset de frentes grises",
-    ),
-    puertaClosetMadera: real(
-      "puertas/puerta-y-closet-madera.jpg",
-      "Puerta y clóset en el mismo tono de madera",
-    ),
-    mesasTerraza: real(
-      "mesas/mesas-terraza-restaurante.jpg",
-      "Mesas con cubierta en madera clara en la terraza de un restaurante",
-    ),
-    mesasRestaurante: real(
-      "mesas/mesas-restaurante-listones.jpg",
-      "Mesas de restaurante con cubierta gris junto a un muro de listones en madera",
-    ),
-    cncAguila: real("cnc/grabado-aguila.jpg", "Águila grabada con CNC sobre una tabla de madera"),
-    cncMapa: real("cnc/mapa-mundi-madera.jpg", "Mapamundi en madera cortado con CNC e instalado en una pared"),
-    cncMapaDetalle: real(
-      "cnc/mapa-mundi-detalle.jpg",
-      "Detalle del mapamundi en madera con piezas en relieve",
-    ),
-    cncLetras: real(
-      "cnc/letras-router-cnc.jpg",
-      "Letras decorativas recién cortadas sobre la mesa del router CNC",
-    ),
-    cncMuro: real(
-      "cnc/muro-ondulado-madera.jpg",
-      "Muro decorativo de listones de madera con forma ondulada",
-    ),
-    cncPanel: real("cnc/panel-parametrico.jpg", "Panel paramétrico de listones ondulados en el taller"),
-    cncLetrero: real(
-      "cnc/letrero-madera-quemada.jpg",
-      "Letrero tallado con CNC sobre madera con acabado quemado",
     ),
   },
 
@@ -176,7 +78,7 @@ export const images = {
     corte: real("taller/corte-recto-y-curvo.jpg", "Operario cortando una lámina en la escuadradora vertical"),
     enchapado: real("taller/enchapado-recto-y-curvo.jpg", "Operario trabajando en la enchapadora de cantos"),
     prensado: real("taller/prensado-de-puertas.jpg", "Prensa para la fabricación de puertas en el taller"),
-    cnc: real("cnc/letras-router-cnc.jpg", "Piezas cortadas sobre la mesa del router CNC"),
+    cnc: real("taller/router-cnc.jpg", "Piezas cortadas sobre la mesa del router CNC"),
     asesoria: real(
       "taller/asesoria-profesional.jpg",
       "Asesor revisando catálogos de acabados con una clienta",

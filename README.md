@@ -124,26 +124,48 @@ interactividad: header (menú móvil), galería y lightbox, formulario y botón 
   conviene reemplazarlo** para que se vea más nítido en pantallas de alta resolución.
 - El favicon (`src/app/icon.png` y `apple-icon.png`) se generó a partir del símbolo del logo.
 
-### Fotografías
-Las fotos de hero, servicios, galería y taller son **trabajos reales de MC Diseños**, tomadas de
-su página de Facebook y guardadas en `public/images/` por categoría (`cocinas/`, `empotrados/`,
-`closets/`, `puertas/`, `mesas/`, `cnc/`, `taller/`, `hero/`).
+### Proyectos de la galería: panel de administración
+Los proyectos se administran desde el panel **`/keystatic`** (por ejemplo
+`https://tu-dominio/keystatic`), sin tocar código:
 
-Solo las texturas de la sección de materiales siguen siendo referencias de Unsplash.
+1. Entra a `/keystatic` e inicia sesión con una cuenta de GitHub que tenga permiso de
+   escritura en el repositorio.
+2. **Proyectos de la galería → Add** para crear uno, o abre uno existente para editarlo.
+3. Completa título, categoría, descripción, foto, descripción de la foto y formato.
+   "Posición en la galería" ordena los proyectos (números menores primero).
+4. Pulsa **Create** / **Save**. El panel guarda el cambio en GitHub y Vercel vuelve a
+   publicar la web en 1–2 minutos.
 
-Para añadir o cambiar fotos:
+Dónde se guarda: `src/content/proyectos/<proyecto>.json` y la foto en
+`public/images/proyectos/<proyecto>/imagen.jpg`. Los tipos están en `src/data/projects.ts` y
+la lectura en `src/server/projects.ts`.
 
-1. Copia la foto en la carpeta que corresponda de `public/images/`.
-2. Regístrala en `src/data/images.ts` con un texto alternativo descriptivo.
-3. Para la galería, añade el proyecto en `src/data/projects.ts`.
+En desarrollo (`npm run dev`) el panel guarda directamente en los archivos del proyecto
+(modo local); reinicia `npm run dev` para ver el cambio en la galería.
 
-Cuando ya no se use ninguna imagen de Unsplash, puedes eliminar `remotePatterns` en
-`next.config.ts`.
+#### Configuración inicial del panel (una sola vez)
+El modo GitHub necesita una GitHub App. Keystatic la crea con un asistente:
 
-### Proyectos
-Edita `src/data/projects.ts`. Cada proyecto tiene título, categoría (una de las 5), descripción,
-imagen, proporción (`standard`, `tall`, `wide`) e `isDemo`. Cuando ningún proyecto tenga
-`isDemo: true`, desaparece automáticamente el aviso de "contenido demostrativo".
+1. En `.env.local` añade `NEXT_PUBLIC_KEYSTATIC_STORAGE=github` y ejecuta `npm run dev`.
+2. Abre `http://localhost:3000/keystatic` y sigue el asistente "Create GitHub App". Al
+   terminar, Keystatic escribe en un archivo `.env` las variables `KEYSTATIC_GITHUB_CLIENT_ID`,
+   `KEYSTATIC_GITHUB_CLIENT_SECRET`, `KEYSTATIC_SECRET` y `NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG`
+   (ese archivo está excluido de Git).
+3. Instala la GitHub App en el repositorio cuando GitHub lo pida.
+4. En la configuración de la GitHub App (GitHub → Settings → Developer settings → GitHub Apps),
+   añade como *Callback URL* `https://<tu-dominio>/api/keystatic/github/oauth/callback`.
+5. Copia esas cuatro variables en Vercel (Settings → Environment Variables) y vuelve a desplegar.
+6. Quita `NEXT_PUBLIC_KEYSTATIC_STORAGE=github` de `.env.local`.
+
+Sin esas variables, el panel queda desactivado en producción y la web funciona igual.
+
+### Fotografías fijas del sitio
+Hero, servicios, llamada a la acción y taller usan fotos reales guardadas en
+`public/images/sitio/` y `public/images/taller/`, registradas en `src/data/images.ts`. Para
+cambiarlas, reemplaza el archivo o actualiza `src` y `alt` en ese registro.
+
+Solo las texturas de la sección de materiales siguen siendo referencias de Unsplash. Cuando ya
+no se use ninguna imagen de Unsplash, puedes eliminar `remotePatterns` en `next.config.ts`.
 
 ### Materiales
 Edita `src/data/materials.ts`. Cuando las muestras correspondan al inventario confirmado,

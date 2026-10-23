@@ -1,0 +1,9 @@
+{
+  "titulo": "Detalle del mapamundi",
+  "categoria": "cnc",
+  "descripcion": "Detalle de las piezas en relieve del mapamundi cortado con CNC.",
+  "imagen": "/images/proyectos/cnc-mapamundi-detalle/imagen.jpg",
+  "textoAlternativo": "Detalle del mapamundi en madera con piezas en relieve",
+  "formato": "standard",
+  "orden": 260
+}

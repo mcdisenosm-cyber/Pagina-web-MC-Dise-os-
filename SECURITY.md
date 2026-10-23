@@ -15,6 +15,20 @@ cuando se añadan funciones que guarden información o un chatbot.
 - No hay secretos en el código. `.env.local` y los archivos de datos/respaldo están
   excluidos en `.gitignore`.
 
+## Panel de administración (/keystatic)
+
+- Solo pueden entrar personas que inicien sesión con GitHub **y** tengan permiso de escritura
+  en el repositorio. Para dar o quitar acceso, gestiona los colaboradores del repositorio.
+- Cada cambio queda registrado como un commit (quién y cuándo), y se puede revertir.
+- En producción solo funciona el modo GitHub. El modo "local" (sin inicio de sesión) queda
+  bloqueado fuera de desarrollo (`src/server/keystatic.ts`).
+- Sin las variables de la GitHub App el panel y su API se desactivan (404).
+- El panel tiene su propia política CSP (permite la API de GitHub y Google Fonts) y la
+  cabecera `X-Robots-Tag: noindex`; además está bloqueado en `robots.txt`.
+- `KEYSTATIC_GITHUB_CLIENT_SECRET` y `KEYSTATIC_SECRET` son secretos: solo en el panel de
+  Vercel/servidor, nunca en el código ni en el chat.
+- Activa la verificación en dos pasos en las cuentas de GitHub que editen el sitio.
+
 ## Reglas para todo el equipo
 
 1. **Secretos fuera del código.** Claves y contraseñas van en variables de entorno del

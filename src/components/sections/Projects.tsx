@@ -1,9 +1,11 @@
-import { projects } from "@/data/projects";
 import { services } from "@/data/services";
+import { getProjects } from "@/server/projects";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ProjectGallery } from "@/components/gallery/ProjectGallery";
 
-export function Projects() {
+export async function Projects() {
+  const projects = await getProjects();
+
   return (
     <section
       id="proyectos"

@@ -1,0 +1,9 @@
+{
+  "titulo": "Letrero tallado",
+  "categoria": "cnc",
+  "descripcion": "Letrero tallado con CNC sobre madera con acabado quemado.",
+  "imagen": "/images/proyectos/cnc-letrero-quemado/imagen.jpg",
+  "textoAlternativo": "Letrero tallado con CNC sobre madera con acabado quemado",
+  "formato": "wide",
+  "orden": 200
+}

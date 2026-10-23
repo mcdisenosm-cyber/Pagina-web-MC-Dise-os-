@@ -1,0 +1,9 @@
+{
+  "titulo": "Panel paramétrico",
+  "categoria": "cnc",
+  "descripcion": "Panel de listones ondulados cortados con CNC, armado en el taller.",
+  "imagen": "/images/proyectos/cnc-panel-parametrico/imagen.jpg",
+  "textoAlternativo": "Panel paramétrico de listones ondulados en el taller",
+  "formato": "wide",
+  "orden": 230
+}

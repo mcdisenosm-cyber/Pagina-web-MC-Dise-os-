@@ -28,6 +28,27 @@ const contentSecurityPolicy = [
   ...(isDev ? [] : ["upgrade-insecure-requests"]),
 ].join("; ");
 
+/**
+ * CSP del panel de administración (/keystatic). Igual de restrictiva que la del
+ * sitio, pero permite hablar con la API de GitHub (donde se guarda el contenido),
+ * mostrar avatares de GitHub e imágenes en memoria (blob:) al subir fotos.
+ */
+const adminContentSecurityPolicy = [
+  "default-src 'self'",
+  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  // La interfaz de Keystatic carga su tipografía (Inter) desde Google Fonts.
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "img-src 'self' blob: data: https://avatars.githubusercontent.com https://*.githubusercontent.com",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  "connect-src 'self' https://api.github.com https://github.com",
+  "worker-src 'self' blob:",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self' https://github.com",
+  "frame-ancestors 'none'",
+  ...(isDev ? [] : ["upgrade-insecure-requests"]),
+].join("; ");
+
 const securityHeaders = [
   { key: "Content-Security-Policy", value: contentSecurityPolicy },
   // Obliga a usar HTTPS durante 2 años (los navegadores lo ignoran en http://localhost).
@@ -53,7 +74,22 @@ const nextConfig: NextConfig = {
   // No revela que el sitio usa Next.js en las cabeceras de respuesta.
   poweredByHeader: false,
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    const adminHeaders = [
+      { key: "Content-Security-Policy", value: adminContentSecurityPolicy },
+      // El panel nunca debe aparecer en buscadores.
+      { key: "X-Robots-Tag", value: "noindex, nofollow" },
+    ];
+    // Las reglas posteriores reemplazan a las anteriores cuando repiten la cabecera.
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      { source: "/keystatic", headers: adminHeaders },
+      { source: "/keystatic/:path*", headers: adminHeaders },
+      { source: "/api/keystatic/:path*", headers: adminHeaders },
+    ];
+  },
+  // El contenido del panel (JSON) se lee en el servidor: hay que incluirlo en el despliegue.
+  outputFileTracingIncludes: {
+    "/": ["./src/content/**/*"],
   },
   images: {
     // Texturas de referencia de Unsplash (sección de materiales). Al reemplazarlas

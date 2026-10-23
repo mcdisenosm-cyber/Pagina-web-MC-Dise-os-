@@ -1,0 +1,9 @@
+{
+  "titulo": "Mueble de baño",
+  "categoria": "empotrados",
+  "descripcion": "Mueble de baño en tono madera con lavamanos integrado y espejo redondo.",
+  "imagen": "/images/proyectos/mueble-bano-espejo/imagen.jpg",
+  "textoAlternativo": "Mueble de baño en tono madera con lavamanos blanco y espejo redondo",
+  "formato": "tall",
+  "orden": 250
+}

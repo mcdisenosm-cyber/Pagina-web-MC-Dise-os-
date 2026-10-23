@@ -1,0 +1,9 @@
+{
+  "titulo": "Barra de cafetería",
+  "categoria": "empotrados",
+  "descripcion": "Barra de atención con frentes en madera clara y listones, mesón en piedra oscura y repisas de exhibición.",
+  "imagen": "/images/proyectos/barra-cafeteria/imagen.jpg",
+  "textoAlternativo": "Barra de cafetería con frentes en madera clara y mesón en piedra oscura",
+  "formato": "standard",
+  "orden": 100
+}

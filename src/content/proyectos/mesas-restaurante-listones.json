@@ -1,0 +1,9 @@
+{
+  "titulo": "Mesas para restaurante",
+  "categoria": "mesas",
+  "descripcion": "Mesas de cubierta gris para el salón de un restaurante con muro y techo de listones en madera.",
+  "imagen": "/images/proyectos/mesas-restaurante-listones/imagen.jpg",
+  "textoAlternativo": "Mesas de restaurante con cubierta gris junto a un muro de listones en madera",
+  "formato": "standard",
+  "orden": 150
+}
