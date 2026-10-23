@@ -58,8 +58,11 @@ export type StoredProject = { slug: string; content: ProjectContent };
 
 /** Lista los proyectos tal como están ahora en GitHub (incluye cambios aún no publicados). */
 export async function listStoredProjects(): Promise<StoredProject[]> {
+  // Se consulta el commit exacto (no el nombre de la rama): justo después de guardar,
+  // GitHub puede tardar unos segundos en reflejar la rama, pero un commit nunca cambia.
+  const head = await gh<{ object: { sha: string } }>(`/git/ref/heads/${branch()}`);
   const files = await gh<{ name: string; sha: string; type: string }[]>(
-    `/contents/${CONTENT_DIR}?ref=${encodeURIComponent(branch())}`,
+    `/contents/${CONTENT_DIR}?ref=${head.object.sha}`,
   );
   const entries = await Promise.all(
     files

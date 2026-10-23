@@ -29,20 +29,19 @@ const contentSecurityPolicy = [
 ].join("; ");
 
 /**
- * CSP del panel de administración (/admin) y del inicio de sesión (/api/auth).
- * Igual de restrictiva que la del sitio; solo añade el inicio de sesión de Google
- * (accounts.google.com) y las fotos de perfil de Google.
+ * CSP del panel de administración (/admin). Igual de restrictiva que la del sitio:
+ * todo se sirve desde el propio dominio (blob: permite la vista previa de la foto).
  */
 const adminContentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' blob: data: https://lh3.googleusercontent.com",
+  "img-src 'self' blob: data:",
   "font-src 'self'",
   "connect-src 'self'",
   "object-src 'none'",
   "base-uri 'self'",
-  "form-action 'self' https://accounts.google.com",
+  "form-action 'self'",
   "frame-ancestors 'none'",
   ...(isDev ? [] : ["upgrade-insecure-requests"]),
 ].join("; ");
@@ -87,7 +86,6 @@ const nextConfig: NextConfig = {
       { source: "/:path*", headers: securityHeaders },
       { source: "/admin", headers: adminHeaders },
       { source: "/admin/:path*", headers: adminHeaders },
-      { source: "/api/auth/:path*", headers: adminHeaders },
     ];
   },
   // El contenido de la galería (JSON) se lee en el servidor: hay que incluirlo en el despliegue.

@@ -1,7 +1,6 @@
 "use client";
 
 import { startTransition, useActionState, useId, useRef, useState, type FormEvent } from "react";
-import Link from "next/link";
 import { ArrowLeft, CircleAlert, ImagePlus, LoaderCircle } from "lucide-react";
 import { saveProject, type SaveProjectState } from "@/app/admin/actions";
 import {
@@ -35,14 +34,28 @@ export function ProjectForm({ categories, slug, initial }: ProjectFormProps) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const isNew = !slug;
 
-  const errors = { ...state.errors, ...clientErrors };
+  // Campos corregidos desde el último envío: su aviso deja de mostrarse.
+  const [edited, setEdited] = useState<Set<string>>(new Set());
+  const errors = Object.fromEntries(
+    Object.entries({ ...state.errors, ...clientErrors }).filter(([key, value]) => value && !edited.has(key)),
+  ) as ProjectFormErrors;
   const busy = pending || preparing;
+
+  const showImageError = (message: string) => {
+    setClientErrors((current) => ({ ...current, imagen: message }));
+    // Un error nuevo de la foto debe verse aunque el campo se acabe de cambiar.
+    setEdited((current) => {
+      const next = new Set(current);
+      next.delete("imagen");
+      return next;
+    });
+  };
 
   const onImageChange = async (file: File | undefined) => {
     setClientErrors((current) => ({ ...current, imagen: undefined }));
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      setClientErrors((current) => ({ ...current, imagen: "Selecciona un archivo de imagen." }));
+      showImageError("Selecciona un archivo de imagen.");
       return;
     }
     setPreparing(true);
@@ -51,10 +64,7 @@ export function ProjectForm({ categories, slug, initial }: ProjectFormProps) {
       setImageFile(resized);
       setPreview(URL.createObjectURL(resized));
     } catch {
-      setClientErrors((current) => ({
-        ...current,
-        imagen: "No se pudo leer la foto. Prueba con un archivo JPG o PNG.",
-      }));
+      showImageError("No se pudo leer la foto. Prueba con un archivo JPG o PNG.");
     } finally {
       setPreparing(false);
     }
@@ -72,6 +82,7 @@ export function ProjectForm({ categories, slug, initial }: ProjectFormProps) {
     const nextErrors = validateProjectForm(fields);
     if (isNew && !imageFile) nextErrors.imagen = "Agrega una foto del proyecto.";
     setClientErrors(nextErrors);
+    setEdited(new Set());
     if (Object.keys(nextErrors).length > 0) {
       formRef.current?.querySelector<HTMLElement>("[aria-invalid='true']")?.focus();
       return;
@@ -95,11 +106,25 @@ export function ProjectForm({ categories, slug, initial }: ProjectFormProps) {
   });
 
   return (
-    <form ref={formRef} onSubmit={onSubmit} noValidate className="space-y-8">
-      <Link href="/admin" className="inline-flex items-center gap-2 text-sm font-semibold text-stone-deep hover:text-carbon">
+    <form
+      ref={formRef}
+      onSubmit={onSubmit}
+      onChange={(event) => {
+        const target = event.target as EventTarget;
+        const name = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement ? target.name : "";
+        // La foto gestiona sus propios avisos en onImageChange.
+        if (name && name !== "imagen") {
+          setEdited((current) => (current.has(name) ? current : new Set(current).add(name)));
+        }
+      }}
+      noValidate
+      className="space-y-8"
+    >
+      {/* Carga completa a propósito: la lista siempre se ve actualizada. */}
+      <a href="/admin" className="inline-flex items-center gap-2 text-sm font-semibold text-stone-deep hover:text-carbon">
         <ArrowLeft className="size-4" aria-hidden="true" />
         Volver a la lista
-      </Link>
+      </a>
 
       {state.message ? (
         <p role="alert" className="border-l-2 border-red-700 bg-red-50 px-4 py-3 text-sm text-red-900">

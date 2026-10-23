@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { requireAdmin } from "@/server/auth";
+import { login, logout, requireAdmin } from "@/server/auth";
 import {
   deleteStoredProject,
   getStoredProject,
@@ -19,6 +19,25 @@ import {
   type ProjectFormErrors,
   type ProjectFormFields,
 } from "@/lib/project-content";
+
+export type LoginState = { error?: string };
+
+/** Inicio de sesión con correo y contraseña (se verifica en el servidor). */
+export async function loginAction(_prev: LoginState, formData: FormData): Promise<LoginState> {
+  const email = formData.get("email");
+  const password = formData.get("password");
+  const result = await login(
+    typeof email === "string" ? email : "",
+    typeof password === "string" ? password : "",
+  );
+  if (!result.ok) return { error: result.error };
+  redirect("/admin");
+}
+
+export async function logoutAction(): Promise<void> {
+  await logout();
+  redirect("/admin");
+}
 
 export type SaveProjectState = {
   errors?: ProjectFormErrors;

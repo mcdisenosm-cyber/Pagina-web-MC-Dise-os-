@@ -1,16 +1,19 @@
+/* El panel navega con <a> (cargas completas de página) a propósito: Next.js conserva en
+   memoria las rutas visitadas y así se evita ver formularios con datos anteriores o listas
+   desactualizadas. */
 import { Suspense } from "react";
 import { connection } from "next/server";
-import Link from "next/link";
 import Image from "next/image";
 import { CircleAlert, CircleCheck, Pencil, Plus } from "lucide-react";
 import { servicesById } from "@/data/services";
 import { getAdminSession, isAdminConfigured } from "@/server/auth";
 import { isGitHubContentConfigured, listStoredProjects } from "@/server/github-content";
 import { buttonClasses } from "@/components/ui/button";
-import { GoogleSignInButton, SignOutButton } from "@/components/admin/AuthButtons";
+import { LoginForm } from "@/components/admin/LoginForm";
+import { SignOutButton } from "@/components/admin/SignOutButton";
 import { DeleteProjectButton } from "@/components/admin/DeleteProjectButton";
 
-type SearchParams = Promise<{ estado?: string; error?: string }>;
+type SearchParams = Promise<{ estado?: string }>;
 
 const statusMessages: Record<string, { ok: boolean; text: string }> = {
   creado: { ok: true, text: "Proyecto publicado. La web se actualizará en 1–2 minutos." },
@@ -18,10 +21,6 @@ const statusMessages: Record<string, { ok: boolean; text: string }> = {
   eliminado: { ok: true, text: "Proyecto eliminado. La web se actualizará en 1–2 minutos." },
   "no-encontrado": { ok: false, text: "Ese proyecto ya no existe." },
   error: { ok: false, text: "No se pudo completar la acción. Intenta de nuevo." },
-};
-
-const loginErrors: Record<string, string> = {
-  AccessDenied: "Esta cuenta de Google no tiene permiso para administrar el sitio.",
 };
 
 export default function AdminPage({ searchParams }: { searchParams: SearchParams }) {
@@ -35,7 +34,7 @@ export default function AdminPage({ searchParams }: { searchParams: SearchParams
 async function AdminHome({ searchParams }: { searchParams: SearchParams }) {
   // Panel privado: siempre se resuelve en cada solicitud (nunca como página estática).
   await connection();
-  const { estado, error } = await searchParams;
+  const { estado } = await searchParams;
 
   if (!isAdminConfigured()) {
     return (
@@ -50,14 +49,8 @@ async function AdminHome({ searchParams }: { searchParams: SearchParams }) {
     return (
       <Card title="Iniciar sesión">
         <p>Acceso exclusivo para el administrador de MC Diseños.</p>
-        {error ? (
-          <p role="alert" className="mt-4 flex items-start gap-2 border-l-2 border-red-700 bg-red-50 px-3 py-2 text-sm text-red-900">
-            <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-            {loginErrors[error] ?? "No se pudo iniciar sesión. Intenta de nuevo."}
-          </p>
-        ) : null}
         <div className="mt-6">
-          <GoogleSignInButton />
+          <LoginForm />
         </div>
       </Card>
     );
@@ -74,10 +67,10 @@ async function AdminHome({ searchParams }: { searchParams: SearchParams }) {
           <p className="mt-2 text-sm text-stone-deep">Sesión iniciada como {admin.email}</p>
         </div>
         <div className="flex flex-wrap gap-3">
-          <Link href="/admin/nuevo" className={buttonClasses("solid")}>
+          <a href="/admin/nuevo" className={buttonClasses("solid")}>
             <Plus className="size-4" aria-hidden="true" />
             Nuevo proyecto
-          </Link>
+          </a>
           <SignOutButton />
         </div>
       </div>
@@ -115,13 +108,13 @@ async function AdminHome({ searchParams }: { searchParams: SearchParams }) {
                   <p className="mt-1 truncate font-semibold text-carbon">{content.titulo}</p>
                   <p className="text-xs text-stone-deep">Posición {content.orden}</p>
                   <div className="mt-auto flex flex-wrap items-center gap-1 pt-2">
-                    <Link
+                    <a
                       href={`/admin/editar/${slug}`}
                       className="inline-flex min-h-10 items-center gap-1.5 px-3 text-sm font-semibold text-carbon transition-colors hover:bg-paper"
                     >
                       <Pencil className="size-4" aria-hidden="true" />
                       Editar
-                    </Link>
+                    </a>
                     <DeleteProjectButton slug={slug} title={content.titulo} />
                   </div>
                 </div>

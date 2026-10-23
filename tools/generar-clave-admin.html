@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Generar clave del panel | MC Diseños</title>
+<style>
+  :root { --carbon: #20221f; --warm: #f7f5f0; --paper: #efebe3; --wood: #7a5634; --stone: #5c5d58; --red: #9b1c1c; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--carbon); font: 16px/1.5 system-ui, sans-serif; }
+  main { max-width: 640px; margin: 40px auto; padding: 32px; background: var(--warm); border: 1px solid #0001; }
+  h1 { margin: 0 0 8px; font-size: 28px; }
+  p, li { color: var(--stone); }
+  label { display: block; margin-top: 20px; font-weight: 600; }
+  input { width: 100%; margin-top: 6px; padding: 10px 12px; font: inherit; border: 1px solid #0003; background: #fff; }
+  button { margin-top: 20px; padding: 12px 20px; font: inherit; font-weight: 600; color: #fff; background: var(--carbon); border: 0; cursor: pointer; }
+  button:disabled { opacity: .6; cursor: default; }
+  .error { color: var(--red); font-weight: 600; }
+  .result { margin-top: 24px; display: none; }
+  .row { margin-top: 16px; }
+  .row b { display: block; }
+  code { display: block; margin-top: 6px; padding: 10px; background: #fff; border: 1px solid #0002; word-break: break-all; font-size: 13px; }
+  .copy { margin-top: 6px; padding: 6px 12px; font-size: 14px; background: var(--wood); }
+  .note { margin-top: 24px; padding: 12px 16px; border-left: 3px solid var(--wood); background: #fff; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Clave del panel de administración</h1>
+  <p>Esta página funciona <strong>sin internet y dentro de tu navegador</strong>: la contraseña no se envía
+     a ningún sitio. Genera los valores que hay que pegar en Vercel.</p>
+  <ul>
+    <li>Usa una contraseña <strong>nueva</strong>, de al menos 12 caracteres, que no uses en otro sitio.</li>
+    <li>Mezcla mayúsculas, minúsculas, números y símbolos (o una frase larga de varias palabras).</li>
+    <li>Nunca la escribas en un chat ni la compartas por mensaje.</li>
+  </ul>
+
+  <form id="form" autocomplete="off" novalidate>
+    <label for="p1">Nueva contraseña</label>
+    <input id="p1" type="password" required minlength="12" autocomplete="new-password">
+    <label for="p2">Repite la contraseña</label>
+    <input id="p2" type="password" required minlength="12" autocomplete="new-password">
+    <p id="msg" class="error" role="alert"></p>
+    <button id="go" type="submit">Generar valores</button>
+  </form>
+
+  <section id="result" class="result" aria-live="polite">
+    <h2>Valores para Vercel</h2>
+    <div class="row"><b>ADMIN_PASSWORD_HASH</b><code id="hash"></code><button class="copy" data-copy="hash">Copiar</button></div>
+    <div class="row"><b>ADMIN_SESSION_SECRET</b><code id="secret"></code><button class="copy" data-copy="secret">Copiar</button></div>
+    <p class="note">Pega cada valor en Vercel (Settings → Environment Variables) y luego cierra esta página.
+       Si olvidas la contraseña, vuelve a abrir esta página, genera valores nuevos y reemplázalos en Vercel.</p>
+  </section>
+</main>
+<script>
+  const ITERATIONS = 600000; // PBKDF2-SHA256, recomendado por OWASP
+  const b64 = (bytes) => btoa(String.fromCharCode(...new Uint8Array(bytes)));
+  const msg = document.getElementById("msg");
+
+  function strengthError(p) {
+    if (p.length < 12) return "La contraseña debe tener al menos 12 caracteres.";
+    const kinds = [/[a-z]/, /[A-Z]/, /[0-9]/, /[^A-Za-z0-9]/].filter((r) => r.test(p)).length;
+    if ((p.length < 16 && kinds < 3) || (p.length < 20 && kinds < 2))
+      return "Usa al menos tres tipos de caracteres (mayúsculas, minúsculas, números, símbolos) o una frase de 20+ caracteres.";
+    if (/^(.)\1+$/.test(p) || /(0123|1234|2345|3456|4567|5678|6789|abcd|qwer)/i.test(p)) return "La contraseña es demasiado predecible.";
+    return "";
+  }
+
+  document.getElementById("form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const p1 = document.getElementById("p1").value;
+    const p2 = document.getElementById("p2").value;
+    msg.textContent = "";
+    if (p1 !== p2) { msg.textContent = "Las contraseñas no coinciden."; return; }
+    const weak = strengthError(p1);
+    if (weak) { msg.textContent = weak; return; }
+
+    const button = document.getElementById("go");
+    button.disabled = true; button.textContent = "Generando…";
+    try {
+      const salt = crypto.getRandomValues(new Uint8Array(16));
+      const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(p1), "PBKDF2", false, ["deriveBits"]);
+      const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt, iterations: ITERATIONS }, key, 256);
+      document.getElementById("hash").textContent = `pbkdf2-sha256$${ITERATIONS}$${b64(salt)}$${b64(bits)}`;
+      document.getElementById("secret").textContent = b64(crypto.getRandomValues(new Uint8Array(32)));
+      document.getElementById("result").style.display = "block";
+      document.getElementById("p1").value = ""; document.getElementById("p2").value = "";
+    } catch (error) {
+      msg.textContent = "Tu navegador no pudo generar la clave. Usa Chrome, Edge o Firefox actualizados.";
+    } finally {
+      button.disabled = false; button.textContent = "Generar valores";
+    }
+  });
+
+  document.querySelectorAll("[data-copy]").forEach((btn) =>
+    btn.addEventListener("click", async () => {
+      await navigator.clipboard.writeText(document.getElementById(btn.dataset.copy).textContent);
+      btn.textContent = "Copiado"; setTimeout(() => (btn.textContent = "Copiar"), 1500);
+    }),
+  );
+</script>
+</body>
+</html>

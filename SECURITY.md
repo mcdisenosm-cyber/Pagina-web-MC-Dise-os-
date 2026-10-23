@@ -17,14 +17,21 @@ cuando se añadan funciones que guarden información o un chatbot.
 
 ## Panel de administración (/admin)
 
-- **Inicio de sesión con Google** (next-auth). Google gestiona la contraseña y la
-  verificación en dos pasos; la web nunca recibe ni guarda contraseñas.
-- Solo entran los correos de `ADMIN_EMAILS` y solo si Google confirma que el correo está
-  verificado. Cualquier otra cuenta ve "no tiene permiso". Para dar o quitar acceso, edita
-  esa variable en Vercel y vuelve a desplegar.
+- **Inicio de sesión propio** con un único administrador (`ADMIN_EMAIL`) y contraseña.
+- La contraseña **nunca se guarda**: solo su huella PBKDF2-SHA256 con 600 000 iteraciones y
+  sal aleatoria (`ADMIN_PASSWORD_HASH`), generada localmente con
+  `tools/generar-clave-admin.html`. La verificación usa comparación de tiempo constante.
+- Contra fuerza bruta: máximo 5 intentos fallidos por IP y por correo cada 15 minutos, demora
+  de ~1 s en cada fallo y el mismo mensaje para correo o contraseña incorrectos.
+  *Limitación:* el contador vive en la memoria de cada instancia del servidor; para un límite
+  global estricto se puede añadir un almacén compartido (por ejemplo Upstash/Redis). Una
+  contraseña larga y única es la defensa principal.
 - **Cada acción del servidor vuelve a comprobar la sesión** (`requireAdmin()` en
   `src/server/auth.ts`) y vuelve a validar los datos; no se confía en el navegador.
-- La sesión es una cookie cifrada, httpOnly, y dura 8 horas.
+- La sesión es una cookie firmada con HMAC-SHA256 (`ADMIN_SESSION_SECRET`), httpOnly,
+  Secure, SameSite=Strict, y dura 8 horas. Cambiar `ADMIN_SESSION_SECRET` cierra todas las
+  sesiones abiertas.
+- En un VPS, configura el proxy (Nginx) para enviar la IP real en `X-Forwarded-For`.
 - Las fotos se validan por contenido (JPG/PNG/WebP reales, máx. 3 MB), se reprocesan y se
   les quitan los metadatos EXIF/GPS antes de publicarse.
 - Los cambios se guardan como commits en GitHub con un **token de grano fino limitado a este
@@ -32,11 +39,12 @@ cuando se añadan funciones que guarden información o un chatbot.
   historial (sin *force push*) y los mensajes de commit no incluyen correos.
 - Sin las variables necesarias, `/admin` muestra "Panel no disponible".
 - El panel tiene `X-Robots-Tag: noindex`, está bloqueado en `robots.txt` y tiene su propia CSP
-  (solo añade `accounts.google.com` y las fotos de perfil de Google).
-- `GOOGLE_CLIENT_SECRET`, `NEXTAUTH_SECRET` y `GITHUB_CONTENT_TOKEN` son secretos: solo en el
-  panel de Vercel/servidor, nunca en el código ni en el chat.
-- Activa la verificación en dos pasos en la cuenta de Google del administrador y renueva el
-  token de GitHub antes de su vencimiento.
+  (todo desde el propio dominio).
+- `ADMIN_PASSWORD_HASH`, `ADMIN_SESSION_SECRET` y `GITHUB_CONTENT_TOKEN` son secretos: solo en
+  el panel de Vercel/servidor, nunca en el código ni en el chat. La contraseña del panel no se
+  escribe en ningún archivo ni mensaje.
+- Renueva el token de GitHub antes de su vencimiento y cambia la contraseña del panel si
+  sospechas que alguien la conoce.
 
 ## Reglas para todo el equipo
 

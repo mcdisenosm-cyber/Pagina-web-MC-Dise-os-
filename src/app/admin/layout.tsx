@@ -14,10 +14,11 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     <div className="min-h-dvh bg-paper">
       <header className="border-b border-carbon/10 bg-warm">
         <div className="container-editorial flex h-16 items-center justify-between gap-4">
-          <Link href="/admin" className="flex items-center gap-3" aria-label="Panel de administración">
+          {/* Carga completa a propósito: el panel siempre se muestra actualizado. */}
+          <a href="/admin" className="flex items-center gap-3" aria-label="Panel de administración">
             <Logo className="h-10" />
             <span className="hidden text-sm font-semibold text-stone-deep sm:inline">Panel de administración</span>
-          </Link>
+          </a>
           <Link
             href="/"
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-stone-deep hover:text-carbon"

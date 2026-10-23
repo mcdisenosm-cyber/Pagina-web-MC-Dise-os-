@@ -128,8 +128,7 @@ interactividad: header (menú móvil), galería y lightbox, formulario y botón 
 Los proyectos se administran desde el panel **`/admin`** (enlace "Iniciar sesión" en el pie de
 página), sin tocar código:
 
-1. Pulsa **Iniciar sesión** → **Iniciar sesión con Google** y entra con la cuenta autorizada.
-   Solo pueden entrar los correos de la variable `ADMIN_EMAILS`.
+1. Pulsa **Iniciar sesión** y entra con el **correo del administrador y su contraseña**.
 2. **Nuevo proyecto** para crear uno, o **Editar / Eliminar** en la lista.
 3. Completa título, categoría, descripción, foto, descripción de la foto, formato y posición
    (números menores aparecen primero). La foto se reduce automáticamente antes de subirla.
@@ -142,27 +141,25 @@ Dónde se guarda: `src/content/proyectos/<proyecto>.json` y la foto en
 GitHub en `src/server/github-content.ts`; inicio de sesión en `src/server/auth.ts`.
 
 #### Configuración del panel (una sola vez)
-Variables de entorno (en Vercel: Settings → Environment Variables; en local: `.env.local`):
+1. **Contraseña:** abre en el navegador el archivo `tools/generar-clave-admin.html` (doble
+   clic; funciona sin internet). Escribe una contraseña nueva y segura y copia los dos valores
+   que genera (`ADMIN_PASSWORD_HASH` y `ADMIN_SESSION_SECRET`). La contraseña no se guarda en
+   ningún lado: solo su huella cifrada.
+2. **Permiso de GitHub:** en GitHub → Settings → Developer settings → Personal access tokens →
+   *Fine-grained tokens* → *Generate new token*: solo este repositorio, permiso
+   *Contents: Read and write*, con fecha de vencimiento. Copia el token.
+3. **Vercel** (Settings → Environment Variables), luego *Redeploy*:
 
-| Variable | Qué es |
+| Variable | Valor |
 |---|---|
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Credenciales OAuth de Google (Google Cloud Console). |
-| `NEXTAUTH_SECRET` | Clave aleatoria para cifrar la sesión (`openssl rand -base64 32`). |
-| `NEXTAUTH_URL` | URL pública del sitio, por ejemplo `https://pagina-web-mc-dise-os.vercel.app`. |
-| `ADMIN_EMAILS` | Correos autorizados, separados por comas. |
-| `GITHUB_CONTENT_TOKEN` | Token de GitHub de grano fino, solo para este repositorio, con permiso *Contents: Read and write*. |
+| `ADMIN_EMAIL` | Correo del administrador (`mcdisenosm@gmail.com`). |
+| `ADMIN_PASSWORD_HASH` | Generado en el paso 1. |
+| `ADMIN_SESSION_SECRET` | Generado en el paso 1. |
+| `GITHUB_CONTENT_TOKEN` | Token del paso 2. |
 
-**Google:** en [Google Cloud Console](https://console.cloud.google.com/) → APIs y servicios →
-Pantalla de consentimiento de OAuth (tipo Externo) → Credenciales → Crear ID de cliente de OAuth
-(Aplicación web). URI de redireccionamiento autorizados:
-`https://<tu-dominio>/api/auth/callback/google` (y `http://localhost:3000/api/auth/callback/google`
-para pruebas locales).
-
-**GitHub:** Settings → Developer settings → Personal access tokens → Fine-grained tokens →
-Generate new token → *Only select repositories* (este repositorio) → *Repository permissions:
-Contents: Read and write*. Ponle fecha de vencimiento y renuévalo antes de que expire.
-
-Sin estas variables, `/admin` muestra "Panel no disponible" y la web funciona igual.
+Para **cambiar la contraseña**, repite el paso 1 y reemplaza los dos valores en Vercel (esto
+también cierra las sesiones abiertas). Sin estas variables, `/admin` muestra "Panel no
+disponible" y la web funciona igual.
 ### Fotografías fijas del sitio
 Hero, servicios, llamada a la acción y taller usan fotos reales guardadas en
 `public/images/sitio/` y `public/images/taller/`, registradas en `src/data/images.ts`. Para
