@@ -1,0 +1,205 @@
+@import "tailwindcss";
+
+/*
+ * Paleta de MC Diseños.
+ * Los tonos "-deep" son variantes más oscuras de la paleta que se usan en textos
+ * pequeños sobre fondos claros para cumplir el contraste mínimo AA (4.5:1).
+ */
+@theme {
+  --color-carbon: #20221f;
+  --color-carbon-soft: #2b2d29;
+  --color-warm: #f7f5f0;
+  --color-paper: #efebe3;
+  --color-sand: #d8c6ae;
+  --color-wood: #a67c52;
+  --color-wood-deep: #7a5634;
+  --color-stone: #777873;
+  --color-stone-deep: #5c5d58;
+
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-instrument), ui-serif, Georgia, serif;
+
+  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --breakpoint-xs: 22.5rem;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-warm);
+    color: var(--color-carbon);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Compensa la altura del header fijo al navegar por anclas. */
+  section[id] {
+    scroll-margin-top: 4.5rem;
+  }
+
+  ::selection {
+    background-color: var(--color-sand);
+    color: var(--color-carbon);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-wood);
+    outline-offset: 3px;
+  }
+
+  .on-dark :focus-visible,
+  .on-dark:focus-visible {
+    outline-color: var(--color-sand);
+  }
+}
+
+@layer components {
+  .container-editorial {
+    width: 100%;
+    max-width: 90rem;
+    margin-inline: auto;
+    padding-inline: 1rem;
+  }
+
+  @media (min-width: 40rem) {
+    .container-editorial {
+      padding-inline: 2rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .container-editorial {
+      padding-inline: 3.5rem;
+    }
+  }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  /* Subrayado animado para enlaces editoriales. */
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.5s var(--ease-editorial);
+  }
+
+  .link-underline:hover,
+  .link-underline:focus-visible {
+    background-size: 100% 1px;
+  }
+}
+
+/*
+ * Aparición sutil al hacer scroll, sin JavaScript (scroll-driven animations).
+ * Los navegadores sin soporte muestran el contenido directamente.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+  }
+
+  .hero-image {
+    animation: hero-settle 2.4s var(--ease-editorial) both;
+  }
+
+  .hero-copy > * {
+    animation: fade-up 1s var(--ease-editorial) both;
+  }
+
+  .hero-copy > *:nth-child(2) {
+    animation-delay: 0.12s;
+  }
+
+  .hero-copy > *:nth-child(3) {
+    animation-delay: 0.24s;
+  }
+
+  .hero-copy > *:nth-child(4) {
+    animation-delay: 0.36s;
+  }
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(2.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes hero-settle {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Lightbox nativo (<dialog>). */
+dialog.lightbox {
+  max-width: 100vw;
+  max-height: 100dvh;
+}
+
+dialog.lightbox::backdrop {
+  background-color: rgb(20 21 19 / 0.94);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  dialog.lightbox[open] {
+    animation: fade-in 0.35s var(--ease-editorial);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

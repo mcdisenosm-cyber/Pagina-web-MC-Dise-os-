@@ -1,0 +1,16 @@
+# Revisa semanalmente las dependencias y abre solicitudes de actualización en GitHub,
+# en especial cuando se publica un parche de seguridad.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    groups:
+      next-react:
+        patterns:
+          - "next"
+          - "eslint-config-next"
+          - "react"
+          - "react-dom"
