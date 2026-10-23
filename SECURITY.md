@@ -5,8 +5,8 @@ cuando se añadan funciones que guarden información o un chatbot.
 
 ## Estado actual
 
-- El sitio **no guarda datos personales**. El formulario valida la información en el
-  navegador y abre WhatsApp con el mensaje redactado; no hay base de datos ni login.
+- El sitio **no guarda datos personales de visitantes**. El formulario valida la información
+  en el navegador y abre WhatsApp con el mensaje redactado; no hay base de datos.
 - El formulario pide **autorización expresa** de tratamiento de datos (Ley 1581 de 2012) y
   enlaza a la [política de privacidad](src/app/politica-de-privacidad/page.tsx).
 - **Cabeceras de seguridad** configuradas en `next.config.ts`: Content-Security-Policy,
@@ -15,19 +15,28 @@ cuando se añadan funciones que guarden información o un chatbot.
 - No hay secretos en el código. `.env.local` y los archivos de datos/respaldo están
   excluidos en `.gitignore`.
 
-## Panel de administración (/keystatic)
+## Panel de administración (/admin)
 
-- Solo pueden entrar personas que inicien sesión con GitHub **y** tengan permiso de escritura
-  en el repositorio. Para dar o quitar acceso, gestiona los colaboradores del repositorio.
-- Cada cambio queda registrado como un commit (quién y cuándo), y se puede revertir.
-- En producción solo funciona el modo GitHub. El modo "local" (sin inicio de sesión) queda
-  bloqueado fuera de desarrollo (`src/server/keystatic.ts`).
-- Sin las variables de la GitHub App el panel y su API se desactivan (404).
-- El panel tiene su propia política CSP (permite la API de GitHub y Google Fonts) y la
-  cabecera `X-Robots-Tag: noindex`; además está bloqueado en `robots.txt`.
-- `KEYSTATIC_GITHUB_CLIENT_SECRET` y `KEYSTATIC_SECRET` son secretos: solo en el panel de
-  Vercel/servidor, nunca en el código ni en el chat.
-- Activa la verificación en dos pasos en las cuentas de GitHub que editen el sitio.
+- **Inicio de sesión con Google** (next-auth). Google gestiona la contraseña y la
+  verificación en dos pasos; la web nunca recibe ni guarda contraseñas.
+- Solo entran los correos de `ADMIN_EMAILS` y solo si Google confirma que el correo está
+  verificado. Cualquier otra cuenta ve "no tiene permiso". Para dar o quitar acceso, edita
+  esa variable en Vercel y vuelve a desplegar.
+- **Cada acción del servidor vuelve a comprobar la sesión** (`requireAdmin()` en
+  `src/server/auth.ts`) y vuelve a validar los datos; no se confía en el navegador.
+- La sesión es una cookie cifrada, httpOnly, y dura 8 horas.
+- Las fotos se validan por contenido (JPG/PNG/WebP reales, máx. 3 MB), se reprocesan y se
+  les quitan los metadatos EXIF/GPS antes de publicarse.
+- Los cambios se guardan como commits en GitHub con un **token de grano fino limitado a este
+  repositorio** (`GITHUB_CONTENT_TOKEN`, permiso *Contents* únicamente). Nunca se reescribe el
+  historial (sin *force push*) y los mensajes de commit no incluyen correos.
+- Sin las variables necesarias, `/admin` muestra "Panel no disponible".
+- El panel tiene `X-Robots-Tag: noindex`, está bloqueado en `robots.txt` y tiene su propia CSP
+  (solo añade `accounts.google.com` y las fotos de perfil de Google).
+- `GOOGLE_CLIENT_SECRET`, `NEXTAUTH_SECRET` y `GITHUB_CONTENT_TOKEN` son secretos: solo en el
+  panel de Vercel/servidor, nunca en el código ni en el chat.
+- Activa la verificación en dos pasos en la cuenta de Google del administrador y renueva el
+  token de GitHub antes de su vencimiento.
 
 ## Reglas para todo el equipo
 

@@ -136,7 +136,7 @@ export function SiteFooter() {
             </Link>
             {/* Acceso al panel de administración: solo entran cuentas autorizadas. */}
             <Link
-              href="/keystatic"
+              href="/admin"
               prefetch={false}
               rel="nofollow"
               className="link-underline inline-flex items-center gap-1.5 self-start py-1 hover:text-carbon sm:self-auto"

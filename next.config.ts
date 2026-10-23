@@ -29,22 +29,20 @@ const contentSecurityPolicy = [
 ].join("; ");
 
 /**
- * CSP del panel de administración (/keystatic). Igual de restrictiva que la del
- * sitio, pero permite hablar con la API de GitHub (donde se guarda el contenido),
- * mostrar avatares de GitHub e imágenes en memoria (blob:) al subir fotos.
+ * CSP del panel de administración (/admin) y del inicio de sesión (/api/auth).
+ * Igual de restrictiva que la del sitio; solo añade el inicio de sesión de Google
+ * (accounts.google.com) y las fotos de perfil de Google.
  */
 const adminContentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
-  // La interfaz de Keystatic carga su tipografía (Inter) desde Google Fonts.
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "img-src 'self' blob: data: https://avatars.githubusercontent.com https://*.githubusercontent.com",
-  "font-src 'self' data: https://fonts.gstatic.com",
-  "connect-src 'self' https://api.github.com https://github.com",
-  "worker-src 'self' blob:",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' blob: data: https://lh3.googleusercontent.com",
+  "font-src 'self'",
+  "connect-src 'self'",
   "object-src 'none'",
   "base-uri 'self'",
-  "form-action 'self' https://github.com",
+  "form-action 'self' https://accounts.google.com",
   "frame-ancestors 'none'",
   ...(isDev ? [] : ["upgrade-insecure-requests"]),
 ].join("; ");
@@ -73,9 +71,11 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   // No revela que el sitio usa Next.js en las cabeceras de respuesta.
   poweredByHeader: false,
-  // Solo desarrollo: el panel (modo GitHub) redirige a 127.0.0.1, que es lo que exige
-  // GitHub para el inicio de sesión local. No afecta a producción.
-  allowedDevOrigins: ["127.0.0.1"],
+  experimental: {
+    // El panel envía fotos ya reducidas en el navegador (< 1 MB normalmente). 3 MB deja
+    // margen y sigue por debajo del límite de 4,5 MB por solicitud de Vercel.
+    serverActions: { bodySizeLimit: "3mb" },
+  },
   async headers() {
     const adminHeaders = [
       { key: "Content-Security-Policy", value: adminContentSecurityPolicy },
@@ -85,12 +85,12 @@ const nextConfig: NextConfig = {
     // Las reglas posteriores reemplazan a las anteriores cuando repiten la cabecera.
     return [
       { source: "/:path*", headers: securityHeaders },
-      { source: "/keystatic", headers: adminHeaders },
-      { source: "/keystatic/:path*", headers: adminHeaders },
-      { source: "/api/keystatic/:path*", headers: adminHeaders },
+      { source: "/admin", headers: adminHeaders },
+      { source: "/admin/:path*", headers: adminHeaders },
+      { source: "/api/auth/:path*", headers: adminHeaders },
     ];
   },
-  // El contenido del panel (JSON) se lee en el servidor: hay que incluirlo en el despliegue.
+  // El contenido de la galería (JSON) se lee en el servidor: hay que incluirlo en el despliegue.
   outputFileTracingIncludes: {
     "/": ["./src/content/**/*"],
   },

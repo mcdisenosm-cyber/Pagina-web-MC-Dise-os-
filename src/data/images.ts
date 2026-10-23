@@ -3,7 +3,7 @@
  * acción y taller). Son trabajos reales de MC Diseños, guardados en
  * /public/images/sitio y /public/images/taller.
  *
- * Las fotos de la GALERÍA no están aquí: se administran desde el panel /keystatic
+ * Las fotos de la GALERÍA no están aquí: se administran desde el panel /admin
  * y viven en /public/images/proyectos (ver src/data/projects.ts).
  *
  * Las texturas de la sección de materiales siguen siendo referencias visuales

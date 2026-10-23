@@ -4,7 +4,7 @@ import type { ServiceId } from "./services";
 /**
  * Tipos de los proyectos de la galería.
  *
- * El contenido NO se escribe aquí: se administra desde el panel /keystatic y se
+ * El contenido NO se escribe aquí: se administra desde el panel /admin y se
  * guarda en src/content/proyectos/*.json (fotos en public/images/proyectos/).
  * La lectura está en src/server/projects.ts.
  *

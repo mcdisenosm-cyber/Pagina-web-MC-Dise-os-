@@ -1,44 +1,43 @@
 import "server-only";
+import { readdir, readFile } from "node:fs/promises";
+import path from "node:path";
 import { cacheLife } from "next/cache";
-import { createReader } from "@keystatic/core/reader";
-import keystaticConfig from "../../keystatic.config";
-import { isServiceId } from "@/data/services";
-import type { Project, ProjectLayout } from "@/data/projects";
+import type { Project } from "@/data/projects";
+import {
+  isValidSlug,
+  parseProjectContent,
+  sortProjectEntries,
+  toProject,
+} from "@/lib/project-content";
 
-const layouts: ProjectLayout[] = ["standard", "tall", "wide"];
+const CONTENT_DIR = path.join(process.cwd(), "src", "content", "proyectos");
 
 /**
- * Lee los proyectos publicados desde el panel (src/content/proyectos).
+ * Lee los proyectos publicados (src/content/proyectos/*.json).
  *
- * El contenido solo cambia cuando el panel hace un commit, lo que dispara un
- * nuevo despliegue; por eso el resultado se cachea al máximo.
- * Las entradas con datos incompletos o una categoría desconocida se omiten
- * para que un error de edición nunca rompa la página.
+ * El contenido solo cambia cuando el panel /admin hace un commit, lo que dispara un
+ * nuevo despliegue; por eso el resultado se cachea al máximo. Las entradas con datos
+ * incompletos se omiten para que un error nunca rompa la página.
  */
 export async function getProjects(): Promise<Project[]> {
   "use cache";
-  // En producción cada publicación del panel genera un despliegue nuevo, así que la
-  // caché máxima es segura. En desarrollo (modo local) reinicia `npm run dev` para
-  // ver en la galería lo editado en el panel.
   cacheLife("max");
 
-  const reader = createReader(process.cwd(), keystaticConfig);
-  const entries = await reader.collections.proyectos.all();
+  const files = (await readdir(CONTENT_DIR)).filter((file) => file.endsWith(".json"));
+  const entries = await Promise.all(
+    files.map(async (file) => {
+      const slug = file.slice(0, -".json".length);
+      if (!isValidSlug(slug)) return null;
+      try {
+        const content = parseProjectContent(JSON.parse(await readFile(path.join(CONTENT_DIR, file), "utf8")));
+        return content ? { slug, content } : null;
+      } catch {
+        return null;
+      }
+    }),
+  );
 
-  return entries
-    .filter(({ entry }) => entry.imagen && isServiceId(entry.categoria))
-    .sort((a, b) => (a.entry.orden ?? 100) - (b.entry.orden ?? 100) || a.entry.titulo.localeCompare(b.entry.titulo, "es"))
-    .map(({ slug, entry }) => ({
-      id: slug,
-      title: entry.titulo,
-      category: entry.categoria as Project["category"],
-      description: entry.descripcion,
-      image: {
-        src: entry.imagen as string,
-        alt: entry.textoAlternativo || entry.titulo,
-        isReference: false,
-      },
-      layout: layouts.includes(entry.formato as ProjectLayout) ? (entry.formato as ProjectLayout) : "standard",
-      isDemo: false,
-    }));
+  return sortProjectEntries(entries.filter((entry) => entry !== null)).map(({ slug, content }) =>
+    toProject(slug, content),
+  );
 }
