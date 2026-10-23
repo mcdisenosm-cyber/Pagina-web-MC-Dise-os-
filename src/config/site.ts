@@ -15,8 +15,18 @@ export const siteConfig = {
   title: "MC Diseños | Cocinas y Muebles a Medida",
   description:
     "Diseño y fabricación de cocinas integrales, muebles empotrados, clósets, puertas y mesas de comedor a medida en láminas de RH, con más de 30 años de experiencia en Pitalito, Huila. Cotiza tu proyecto por WhatsApp.",
-  /** URL pública del sitio. Se define con NEXT_PUBLIC_SITE_URL al desplegar. */
-  url: normalizeUrl(process.env.NEXT_PUBLIC_SITE_URL) ?? "http://localhost:3000",
+  /**
+   * URL pública del sitio. Prioridad: NEXT_PUBLIC_SITE_URL (dominio propio) →
+   * dominio de producción que Vercel asigna automáticamente → localhost.
+   */
+  url:
+    normalizeUrl(process.env.NEXT_PUBLIC_SITE_URL) ??
+    normalizeUrl(
+      process.env.VERCEL_PROJECT_PRODUCTION_URL
+        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+        : undefined,
+    ) ??
+    "http://localhost:3000",
   locale: "es_CO",
   /** Años de experiencia confirmados por la empresa (aparece en la fachada de su sede). */
   experienceYears: 30,
