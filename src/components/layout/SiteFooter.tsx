@@ -1,6 +1,6 @@
 import { cacheLife } from "next/cache";
 import Link from "next/link";
-import { ArrowUpRight, Mail, MapPin } from "lucide-react";
+import { ArrowUpRight, LogIn, Mail, MapPin } from "lucide-react";
 import { navigation, siteConfig } from "@/config/site";
 import { services } from "@/data/services";
 import { formatWhatsAppNumber, isWhatsAppConfigured, whatsappMessages } from "@/lib/whatsapp";
@@ -127,12 +127,24 @@ export function SiteFooter() {
             © <CurrentYear /> {siteConfig.legal.companyName} · NIT {siteConfig.legal.nit}. Todos los
             derechos reservados.
           </p>
-          <Link
-            href={siteConfig.legal.privacyPolicyPath}
-            className="link-underline self-start py-1 hover:text-carbon sm:self-auto"
-          >
-            Política de tratamiento de datos personales
-          </Link>
+          <div className="flex flex-col gap-1 sm:flex-row sm:gap-6">
+            <Link
+              href={siteConfig.legal.privacyPolicyPath}
+              className="link-underline self-start py-1 hover:text-carbon sm:self-auto"
+            >
+              Política de tratamiento de datos personales
+            </Link>
+            {/* Acceso al panel de administración: solo entran cuentas autorizadas. */}
+            <Link
+              href="/keystatic"
+              prefetch={false}
+              rel="nofollow"
+              className="link-underline inline-flex items-center gap-1.5 self-start py-1 hover:text-carbon sm:self-auto"
+            >
+              <LogIn className="size-3.5" aria-hidden="true" />
+              Iniciar sesión
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

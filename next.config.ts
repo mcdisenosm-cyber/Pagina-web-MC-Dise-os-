@@ -73,6 +73,9 @@ const nextConfig: NextConfig = {
   partialPrefetching: true,
   // No revela que el sitio usa Next.js en las cabeceras de respuesta.
   poweredByHeader: false,
+  // Solo desarrollo: el panel (modo GitHub) redirige a 127.0.0.1, que es lo que exige
+  // GitHub para el inicio de sesión local. No afecta a producción.
+  allowedDevOrigins: ["127.0.0.1"],
   async headers() {
     const adminHeaders = [
       { key: "Content-Security-Policy", value: adminContentSecurityPolicy },
