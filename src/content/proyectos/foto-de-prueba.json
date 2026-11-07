@@ -1,0 +1,9 @@
+{
+  "titulo": "FOTO DE PRUEBA",
+  "categoria": "puertas",
+  "descripcion": "prueba a ver si carga correcta mente",
+  "imagen": "/images/proyectos/foto-de-prueba/imagen.jpg",
+  "textoAlternativo": "una pruevaaaaaaaaaaaaaaaaaaaaaaa",
+  "formato": "wide",
+  "orden": 5
+}
